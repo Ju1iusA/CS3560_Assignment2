@@ -7,6 +7,8 @@ public class UserViewframe extends JFrame {
     private final User currentUser;
     private final DefaultListModel<String> followingModel = new DefaultListModel<>();
     private final DefaultListModel<String> newsFeedModel = new DefaultListModel<>();
+    
+    private final JLabel lblTimestamps = new JLabel();
 
     public UserViewframe(User user) {
         currentUser = user;
@@ -16,6 +18,11 @@ public class UserViewframe extends JFrame {
         setSize(400, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+
+        //Time Display Section
+        lblTimestamps.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblTimestamps.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        add(lblTimestamps);
 
         //Follow User Section
         JTextField txtFollow = new JTextField();
@@ -84,6 +91,8 @@ public class UserViewframe extends JFrame {
             currentUser.getFollowingsIds().forEach(id -> followingModel.addElement("- " + id));
             newsFeedModel.clear();
             currentUser.getNewsFeed().forEach(tweet -> newsFeedModel.addElement("- " + tweet));
+            
+            lblTimestamps.setText("Created: " + currentUser.getCreationTime() + " | Updated: " + currentUser.getLastUpdateTime());
         });
     }
 }
