@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
 
 public class AdminControlPanel extends JFrame {
 	
-	//Singleton instance
+    //Singleton instance
     private static AdminControlPanel instance; 
 
     //Tracks user hierarchy
@@ -69,16 +69,23 @@ public class AdminControlPanel extends JFrame {
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2; gbc.weighty = 0.2;
         rightControls.add(btnOpenUserView, gbc);
 
-        //Inside of user view
-        JPanel analyticsGrid = new JPanel(new GridLayout(2, 2, 10, 10));
+        //New buttons
+        JPanel analyticsGrid = new JPanel(new GridLayout(3, 2, 10, 10));
         JButton btnUserTotal = new JButton("Show User Total");
         JButton btnGroupTotal = new JButton("Show Group Total");
         JButton btnMsgTotal = new JButton("Show Messages Total");
         JButton btnPositivePerc = new JButton("Show Positive Percentage");
+        
+        JButton btnValidateIds = new JButton("Validate IDs");
+        JButton btnLastUpdatedUser = new JButton("Find Last Updated User");
+        
         analyticsGrid.add(btnUserTotal);
         analyticsGrid.add(btnGroupTotal);
         analyticsGrid.add(btnMsgTotal);
         analyticsGrid.add(btnPositivePerc);
+        
+        analyticsGrid.add(btnValidateIds);
+        analyticsGrid.add(btnLastUpdatedUser);
 
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2; gbc.weighty = 0.6;
         rightControls.add(analyticsGrid, gbc);
@@ -149,6 +156,21 @@ public class AdminControlPanel extends JFrame {
         btnPositivePerc.addActionListener(e -> {
             JOptionPane.showMessageDialog(null, String.format("Positive Tweets: %.2f%%", runAnalytics().getPositivePercentage()));
         });
+        
+        //ID validation system
+        btnValidateIds.addActionListener(e -> {
+            boolean valid = runAnalytics().areAllIdsValid();
+            if (valid) {
+                JOptionPane.showMessageDialog(null, "All IDs are valid.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Validation failed. Spaces or Duplicates found.");
+            }
+        });
+
+        //Pulls the ID of the user who made the most recent timestamp update
+        btnLastUpdatedUser.addActionListener(e -> {
+            JOptionPane.showMessageDialog(null, "Last Updated User ID: " + runAnalytics().getLastUpdatedUser());
+        });
 
     }
 
@@ -169,10 +191,6 @@ public class AdminControlPanel extends JFrame {
     private boolean validateNewId(String id) {
         if (id.isEmpty()) {
             JOptionPane.showMessageDialog(null, "ID cannot be empty.");
-            return false;
-        }
-        if (allEntries.containsKey(id)) {
-            JOptionPane.showMessageDialog(null, "ID '" + id + "' already exists.");
             return false;
         }
         return true;
