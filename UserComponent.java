@@ -6,22 +6,38 @@ import java.util.function.Consumer;
 
 interface UserComponent {
     String getId();
+    long getCreationTime();
 }
 
 class User implements UserComponent {
-	//User properties
+    //User properties
     private final String id;
     private final List<Consumer<String>> followerFeeds = new ArrayList<>();
     private final List<String> followingsIds = new ArrayList<>();
     private final List<String> newsFeed = new ArrayList<>();
     private final List<Runnable> uiListeners = new ArrayList<>();
+    
+    private final long userCreationTime;
+    private long lastUpdateTime;
 
     public User(String userId) {
         id = userId;
+        userCreationTime = System.currentTimeMillis();
+        lastUpdateTime = userCreationTime;
     }
 
     public String getId() {
         return id;
+    }
+    
+    //Getter for creation time
+    public long getCreationTime() {
+        return userCreationTime;
+    }
+    
+    //Getter to read when the user last tweeted or received a tweet
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
     }
 
     public String toString() {
@@ -43,6 +59,7 @@ class User implements UserComponent {
 
     //When receiving from followed users
     public void update(String tweet) {
+        lastUpdateTime = System.currentTimeMillis();
         newsFeed.add(tweet);
         uiListeners.forEach(Runnable::run);
     }
@@ -59,6 +76,8 @@ class User implements UserComponent {
 
     //Reveals tweet to everyone
     public void postTweet(String message) {
+        //Automatically updates the time
+        lastUpdateTime = System.currentTimeMillis();
         String formattedTweet = id + ": " + message;
         newsFeed.add(formattedTweet);
         uiListeners.forEach(Runnable::run);
@@ -75,13 +94,21 @@ class User implements UserComponent {
 class UserGroup implements UserComponent {
     private final String id;
     private final List<UserComponent> children = new ArrayList<>();
+    
+    //Time tracking variable
+    private final long groupCreationTime;
 
     public UserGroup(String groupId) {
         id = groupId; 
+        groupCreationTime = System.currentTimeMillis();
     }
 
     public String getId() {
         return id;
+    }
+    
+    public long getCreationTime() {
+        return groupCreationTime;
     }
 
     public String toString() {
